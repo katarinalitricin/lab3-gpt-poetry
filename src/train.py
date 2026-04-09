@@ -18,7 +18,7 @@ n_layer = 6
 dropout = 0.1
 
 learning_rate = 3e-4
-max_iters = 30000
+max_iters = 10000
 eval_interval = 500
 eval_iters = 200
 sample_interval = 500
