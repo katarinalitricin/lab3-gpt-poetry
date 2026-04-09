@@ -25,7 +25,12 @@ sample_interval = 500
 save_interval = 2000
 grad_clip = 1.0
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+if torch.cuda.is_available():
+    device = "cuda"
+elif torch.backends.mps.is_available():
+    device = "mps"
+else:
+    device = "cpu"
 
 out_dir = Path("outputs/checkpoints")
 sample_dir = Path("outputs/samples")
