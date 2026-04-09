@@ -18,16 +18,19 @@ n_layer = 6
 dropout = 0.1
 
 learning_rate = 3e-4
-max_iters = 5000          
-eval_interval = 200
-eval_iters = 50
+max_iters = 30000
+eval_interval = 500
+eval_iters = 200
 sample_interval = 500
-save_interval = 500
+save_interval = 2000
+grad_clip = 1.0
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 out_dir = Path("outputs/checkpoints")
 sample_dir = Path("outputs/samples")
+log_path = Path("outputs/losses.pt")
+
 out_dir.mkdir(parents=True, exist_ok=True)
 sample_dir.mkdir(parents=True, exist_ok=True)
 
@@ -142,6 +145,11 @@ def main():
 
     best_val_loss = float("inf")
 
+    # added: loss logs
+    steps_log = []
+    train_log = []
+    val_log = []
+
     # --------------------------------------------------------
     # Training loop
 
@@ -155,6 +163,7 @@ def main():
 
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         optimizer.step()
 
         if step % 50 == 0:
@@ -171,6 +180,19 @@ def main():
                 f"val loss {val_loss:.4f}"
             )
 
+            # added: save logs
+            steps_log.append(step)
+            train_log.append(train_loss)
+            val_log.append(val_loss)
+            torch.save(
+                {
+                    "steps": steps_log,
+                    "train_loss": train_log,
+                    "val_loss": val_log,
+                },
+                log_path,
+            )
+
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 save_checkpoint(model, optimizer, config, stoi, itos, step, best_val_loss)
@@ -182,6 +204,10 @@ def main():
         if step % save_interval == 0 and step > 0:
             save_checkpoint(model, optimizer, config, stoi, itos, step, best_val_loss)
             print("  -> saved periodic checkpoint")
+
+    # added: final checkpoint
+    save_checkpoint(model, optimizer, config, stoi, itos, max_iters, best_val_loss)
+    print("Saved final checkpoint.")
 
     print("Training complete.")
 
