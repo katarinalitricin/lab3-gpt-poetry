@@ -10,12 +10,12 @@ from model import GPT, GPTConfig
 # ============================================================
 # Config
 
-block_size = 256
+block_size = 128
 batch_size = 32
 n_embd = 256
 n_head = 8
 n_layer = 6
-dropout = 0.2
+dropout = 0.1
 
 learning_rate = 3e-4
 max_iters = 10000
