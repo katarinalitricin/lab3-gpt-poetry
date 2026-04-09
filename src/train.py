@@ -15,7 +15,7 @@ batch_size = 32
 n_embd = 256
 n_head = 8
 n_layer = 4
-dropout = 0.1
+dropout = 0.2
 
 learning_rate = 3e-4
 max_iters = 10000
