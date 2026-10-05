@@ -1,1 +1,1 @@
-# lab3-gpt-poetry
+# gpt-poetry
